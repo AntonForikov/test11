@@ -18,7 +18,9 @@ import {CircularProgress} from '@mui/material';
 
 const initialFields = {
   username: '',
-  password: ''
+  password: '',
+  displayName: '',
+  phoneNumber: ''
 };
 const Register = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +39,14 @@ const Register = () => {
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (user.displayName[0] === ' ' || user.displayName === '') {
+      alert('Display name can not be an empty string or berins from whitespace.');
+      return;
+    }
+    if (user.phoneNumber[0] === ' ' || user.phoneNumber === '') {
+      alert('Phone number can not be an empty string or berins from whitespace.');
+      return;
+    }
     await dispatch(register(user)).unwrap();
     navigate('/');
   };
@@ -90,6 +100,30 @@ const Register = () => {
                 onChange={changeEventHandler}
                 error={Boolean(getFieldError('password'))}
                 helperText={getFieldError('password')}
+              />
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Display name"
+                name="displayName"
+                value={user.displayName}
+                onChange={changeEventHandler}
+                autoFocus
+                // error={Boolean(getFieldError('username'))}
+                // helperText={getFieldError('username')}
+                required
+              />
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Phone Number"
+                name="phoneNumber"
+                value={user.phoneNumber}
+                onChange={changeEventHandler}
+                autoFocus
+                // error={Boolean(getFieldError('username'))}
+                // helperText={getFieldError('username')}
+                required
               />
               <Grid container justifyContent="space-between" alignItems="center">
                 <FormControlLabel

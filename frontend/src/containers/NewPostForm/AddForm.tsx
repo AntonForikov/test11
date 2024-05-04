@@ -1,4 +1,4 @@
-import {Button, Grid, TextField} from '@mui/material';
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import React, {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
@@ -110,6 +110,33 @@ const AddForm = () => {
             name="image"
             label="Image"
           />
+        </Grid>
+        <Grid item xs>
+          <TextField
+            type={'number'}
+            fullWidth
+            variant="outlined"
+            label="Price"
+            name="price"
+            // value={post.description}
+            // onChange={changeNewsHandler}
+          />
+        </Grid>
+        <Grid item xs>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              // id="demo-simple-select"
+              value={'dfg'}
+              label="Age"
+              // onChange={handleChange}
+            >
+              <MenuItem value={10}>Ten</MenuItem>
+              <MenuItem value={20}>Twenty</MenuItem>
+              <MenuItem value={30}>Thirty</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs>
           <Button type="submit" variant="contained" endIcon={<SendIcon/>}>

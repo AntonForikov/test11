@@ -16,7 +16,7 @@ function App() {
         <Container maxWidth='xl'>
           <Routes>
             <Route path='/' element={<Home/>}/>
-            <Route path='/newPost' element={<AddForm />}/>
+            <Route path='/newItem' element={<AddForm />}/>
             <Route path='/post/:postId' element={<Post />}/>
             <Route path='/register' element={<Register />}/>
             <Route path='/login' element={<Login />}/>
