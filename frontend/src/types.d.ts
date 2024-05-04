@@ -1,39 +1,45 @@
-export interface Post {
+export interface Product {
   title: string,
   description: string,
-  image: File | null
+  image: File | null,
+  price: number,
+  category: string,
 }
 
-export interface PostFromDb extends Post {
-  _id: string;
-  image: string | null
-  user: string
-  date: string
-  commentCount: string
-}
-
-export interface PostComment {
-  _id: string;
+export interface TargetProduct extends ProductFromDb{
   user: {
-    username: string
-  },
-  text: string
+    _id: string;
+    displayName: string;
+    username: string;
+    phoneNumber: string
+  };
+  category: {
+    _id: string;
+    title: string;
+  }
 }
 
-export interface Comment {
-  text: string
+export interface ProductFromDb {
+  _id: string;
+  image: string;
+  user: string;
+  title: string;
+  description: string;
+  category: string;
+  price: string;
 }
 
-export interface CommentToSend extends Comment{
-  post: string
-}
-
-export interface PostById {
+export interface CategoryFromDb {
   _id: string;
   title: string;
-  image: string | null;
-  description: string | null;
-  date: string;
+}
+
+interface CategoryMutation {
+  _id: string;
+  title: string
+}
+export interface ProductByCategory extends ProductFromDb{
+  category: CategoryMutation
 }
 
 export interface UserFromDb {

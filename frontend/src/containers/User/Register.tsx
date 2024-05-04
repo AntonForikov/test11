@@ -109,8 +109,6 @@ const Register = () => {
                 value={user.displayName}
                 onChange={changeEventHandler}
                 autoFocus
-                // error={Boolean(getFieldError('username'))}
-                // helperText={getFieldError('username')}
                 required
               />
               <TextField
@@ -121,8 +119,6 @@ const Register = () => {
                 value={user.phoneNumber}
                 onChange={changeEventHandler}
                 autoFocus
-                // error={Boolean(getFieldError('username'))}
-                // helperText={getFieldError('username')}
                 required
               />
               <Grid container justifyContent="space-between" alignItems="center">
