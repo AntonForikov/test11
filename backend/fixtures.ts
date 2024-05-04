@@ -24,21 +24,21 @@ const resetDB = async () => {
     {
       username: 'user1',
       password: '1',
-      displayName: 'First user display name',
+      displayName: 'Vasya',
       phoneNumber: '+996111111111',
       token: crypto.randomUUID()
     },
     {
       username: 'user2',
       password: '2',
-      displayName: 'Second user display name',
+      displayName: 'Petya',
       phoneNumber: '+996222222222',
       token: crypto.randomUUID()
     },
     {
       username: 'user3',
       password: '3',
-      displayName: 'Third user display name',
+      displayName: 'Goga',
       phoneNumber: '+996333333333',
       token: crypto.randomUUID()
     },
