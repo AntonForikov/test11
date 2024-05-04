@@ -1,16 +1,16 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Post from '../models/post';
+import Product from '../models/product';
 import auth, {Auth} from '../middleware/auth';
 import {imagesUpload} from '../multer';
 import {ObjectId} from 'mongodb';
 import {PostById} from '../types';
 
-const postRouter = express.Router();
+const productRouter = express.Router();
 
-postRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res, next) => {
+productRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res, next) => {
   try {
-    const {title, description} = req.body;
+    const {title, description, price} = req.body;
 
     if (!description && !req.file) return res.status(400).send({error: 'You should provide Image or Description'});
 
@@ -22,7 +22,7 @@ postRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res, n
       date: new Date()
     };
 
-    const post = new Post(postData);
+    const post = new Product(postData);
     await post.save();
 
     return res.send(post);
@@ -32,9 +32,9 @@ postRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res, n
   }
 });
 
-postRouter.get('/', async (_, res, next) => {
+productRouter.get('/', async (_, res, next) => {
   try {
-    const postList = await Post.aggregate(
+    const postList = await Product.aggregate(
       [
         {
           $sort: {date: -1}
@@ -74,7 +74,7 @@ postRouter.get('/', async (_, res, next) => {
   }
 });
 
-postRouter.get('/:id', auth, async (req, res, next) => {
+productRouter.get('/:id', auth, async (req, res, next) => {
   try {
     const {id} = req.params;
     let _id: ObjectId;
@@ -84,7 +84,7 @@ postRouter.get('/:id', auth, async (req, res, next) => {
       return res.status(400).send({error: 'Request param  is not an ObjectId'});
     }
 
-    const post: PostById[] = await Post.aggregate(
+    const post: PostById[] = await Product.aggregate(
       [
         {
           $match: { _id }
@@ -117,4 +117,4 @@ postRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-export default postRouter
+export default productRouter
