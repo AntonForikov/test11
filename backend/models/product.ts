@@ -34,8 +34,12 @@ const ProductSchema = new Schema ({
     type: String,
     required: true
   },
+  price: {
+    type: String,
+    required: true
+  }
 }, {versionKey: false});
 
-const Product = model('post', ProductSchema);
+const Product = model('product', ProductSchema);
 
 export default Product;

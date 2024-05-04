@@ -4,28 +4,34 @@ import Product from '../models/product';
 import auth, {Auth} from '../middleware/auth';
 import {imagesUpload} from '../multer';
 import {ObjectId} from 'mongodb';
-import {PostById} from '../types';
 
 const productRouter = express.Router();
 
 productRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res, next) => {
   try {
-    const {title, description, price} = req.body;
+    const {title, description, price, category} = req.body;
 
-    if (!description && !req.file) return res.status(400).send({error: 'You should provide Image or Description'});
+    let categoryId: ObjectId;
 
-    const postData = {
+    try {
+      categoryId = new ObjectId(category);
+    } catch (e) {
+      return res.status(400).send({error: 'Category is not an Object Id'})
+    }
+
+    const productData = {
       user: req.user?._id,
-      title: title.trim(),
-      description: description ? description : null,
-      image: req.file ? req.file.filename : null,
-      date: new Date()
+      title: title,
+      description: description,
+      image: req.file?.filename,
+      category: categoryId,
+      price: price
     };
 
-    const post = new Product(postData);
-    await post.save();
+    const product = new Product(productData);
+    await product.save();
 
-    return res.send(post);
+    return res.send(product);
   } catch (e) {
     if (e instanceof mongoose.Error.ValidationError) return res.status(400).send(e);
     next(e);
@@ -34,41 +40,9 @@ productRouter.post('/', auth, imagesUpload.single('image'), async (req: Auth,res
 
 productRouter.get('/', async (_, res, next) => {
   try {
-    const postList = await Product.aggregate(
-      [
-        {
-          $sort: {date: -1}
-        },
-        {
-          $lookup: {
-            from: "comments",
-            localField: "_id",
-            foreignField: "post",
-            as: "comments"
-          }
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "userList"
-          }
-        },
-        {
-          $project: {
-            _id: 1,
-            title: 1,
-            image: 1,
-            date: 1,
-            user: {$first: '$userList.username'},
-            commentCount: {$size: '$comments'}
-          }
-        },
-      ]
-    );
+    const products = await Product.find().select('_id title image price user');
 
-    return res.send(postList);
+    return res.send(products);
   } catch (e) {
     next(e);
   }
@@ -84,33 +58,35 @@ productRouter.get('/:id', auth, async (req, res, next) => {
       return res.status(400).send({error: 'Request param  is not an ObjectId'});
     }
 
-    const post: PostById[] = await Product.aggregate(
-      [
-        {
-          $match: { _id }
-        },
-        {
-          $lookup: {
-            from: "comments",
-            localField: "_id",
-            foreignField: "post",
-            as: "comments",
-          }
-        },
-        {
-          $project: {
-            _id: 1,
-            title: 1,
-            description: 1,
-            image: 1,
-            date: 1,
-          }
-        },
-      ]
-    );
-    if (post.length === 0) return res.status(400).send({error: 'There is no such post in database.'});
+    const product = await Product.findById(_id)
+      .populate('user', '-token')
+    if (!product) return res.status(400).send({error: 'There is no such product in database.'});
 
-    return res.send(post[0]);
+    return res.send(product);
+  } catch (e) {
+    if (e instanceof mongoose.Error.CastError) return res.status(400).send(e);
+    next(e);
+  }
+});
+
+productRouter.delete('/:id', auth, async (req: Auth, res, next) => {
+  try {
+    const {id} = req.params;
+    let _id: ObjectId;
+    try {
+      _id = new ObjectId(id);
+    } catch (e) {
+      return res.status(400).send({error: 'Request param  is not an ObjectId'});
+    }
+
+    const product = await Product.findById(_id)
+      .populate('user')
+    if (!product) return res.status(400).send({error: 'There is no such product in database.'});
+
+    if (product.user._id.toString() !== req.user?._id.toString()) return res.status(400).send({error: 'You can not delete not your product.'});
+
+    await Product.deleteOne(_id);
+    return res.send({success: 'Product Deleted.'});
   } catch (e) {
     if (e instanceof mongoose.Error.CastError) return res.status(400).send(e);
     next(e);
