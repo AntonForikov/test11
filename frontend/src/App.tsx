@@ -4,8 +4,9 @@ import {Route, Routes} from 'react-router-dom';
 import Register from './containers/User/Register';
 import Login from './containers/User/Login';
 import Container from '@mui/material/Container';
-import AddForm from './containers/NewPostForm/AddForm';
-import Post from './containers/Post/Post';
+import AddForm from './containers/NewProductForm/AddForm';
+import Product from './containers/Product/Product';
+import ProductsByCategory from './containers/Product/ProductsByCategory';
 function App() {
   return (
     <>
@@ -17,7 +18,8 @@ function App() {
           <Routes>
             <Route path='/' element={<Home/>}/>
             <Route path='/newItem' element={<AddForm />}/>
-            <Route path='/post/:postId' element={<Post />}/>
+            <Route path='/product/:productId' element={<Product />}/>
+            <Route path='/category/:id' element={<ProductsByCategory />}/>
             <Route path='/register' element={<Register />}/>
             <Route path='/login' element={<Login />}/>
             <Route path="*" element={<h1>Not found</h1>}/>
