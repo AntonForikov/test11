@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import config from './config';
 import User from './models/user';
-import Post from './models/post';
-import Comment from './models/comment';
+import Product from './models/product';
+import Category from './models/category';
 
 const dropCollections = async (db: mongoose.Connection, collectionName: string) => {
   try {
@@ -12,7 +12,7 @@ const dropCollections = async (db: mongoose.Connection, collectionName: string) 
   }
 };
 
-const collections = ['posts', 'comments', 'users'];
+const collections = ['users', 'products', 'categories'];
 
 const resetDB = async () => {
   await mongoose.connect(config.mongoose.db);
@@ -20,56 +20,85 @@ const resetDB = async () => {
 
   for (const collection of collections) await dropCollections(db, collection);
 
-  const [user1, user2] = await User.create(
+  const [user1, user2, user3] = await User.create(
     {
       username: 'user1',
       password: '1',
+      displayName: 'First user display name',
+      phoneNumber: '+996111111111',
       token: crypto.randomUUID()
     },
     {
       username: 'user2',
       password: '2',
+      displayName: 'Second user display name',
+      phoneNumber: '+996222222222',
       token: crypto.randomUUID()
-    }
-  );
-
-  const [post1, post2] = await Post.create(
-    {
-      user: user1._id,
-      title: 'Title for first post',
-      description: null,
-      image: 'fixtureImages/tool_artist.jpeg',
-      date: new Date()
     },
     {
-      user: user2._id,
-      title: 'Title for second post',
-      description: 'Description for second post',
-      image: null,
-      date: new Date()
+      username: 'user3',
+      password: '3',
+      displayName: 'Third user display name',
+      phoneNumber: '+996333333333',
+      token: crypto.randomUUID()
+    },
+  );
+
+  const [category1, category2, category3, category4] = await Category.create(
+    {
+      title: 'Cars'
+    },
+    {
+      title: 'Computers'
+    },
+    {
+      title: 'Moto'
+    },
+    {
+      title: 'Mobiles'
     }
   )
 
-  await Comment.create(
+  await Product.create(
     {
       user: user1,
-      post: post1,
-      text: 'First Comment from first user'
+      category: category1,
+      title: 'Honda',
+      description: 'Civic',
+      image: 'fixtureImages/honda.jpeg',
+      price: '10045',
     },
     {
       user: user2,
-      post: post1,
-      text: 'Second Comment from second user'
+      category: category1,
+      title: 'Toyota',
+      description: '4Runner',
+      image: 'fixtureImages/4Runner.jpeg',
+      price: '23245',
+    },
+    {
+      user: user3,
+      category: category3,
+      title: 'Honda',
+      description: 'Africa Twin',
+      image: 'fixtureImages/new_africa.jpeg',
+      price: '2100',
     },
     {
       user: user1,
-      post: post2,
-      text: 'First Comment from first user'
+      category: category4,
+      title: 'iPhone',
+      description: 'Pro max 15',
+      image: 'fixtureImages/iphone.jpeg',
+      price: '1300',
     },
     {
       user: user2,
-      post: post2,
-      text: 'Second Comment from second user'
+      category: category2,
+      title: 'Macbook',
+      description: 'm3',
+      image: 'fixtureImages/macbook.jpeg',
+      price: '2100',
     }
   )
 
