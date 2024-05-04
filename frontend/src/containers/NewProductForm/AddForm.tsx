@@ -1,29 +1,39 @@
-import {Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from '@mui/material';
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import React, {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import FileInput from './FileInput';
 import {useNavigate} from 'react-router-dom';
-import {Post} from '../../types';
-import {newPost} from '../../store/post/postThunk';
+import {Product} from '../../types';
+import {getCategories, newProduct} from '../../store/product/productThunk';
 import {selectUser} from '../../store/user/userSlice';
+import {selectCategories} from '../../store/product/productSlice';
 
-const initialMessage: Post = {
+const initialProduct: Product = {
   title: '',
   description: '',
-  image: null
+  image: null,
+  price: 0,
+  category: ''
 };
 const AddForm = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  const [post, setPost] = useState<Post>(initialMessage);
+  const categories = useAppSelector(selectCategories);
+  const [product, setProduct] = useState<Product>(initialProduct);
   const [fileName, setFileName] = useState('');
   const resetButtonRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const [disabler, setDisabler] = useState(false);
+
   useEffect(() => {
     if (!user) navigate('/');
   }, [user, navigate]);
+
+  useEffect(() => {
+    dispatch(getCategories());
+  }, [dispatch]);
 
   const resetFileInput = () => {
     if (resetButtonRef.current) {
@@ -31,9 +41,17 @@ const AddForm = () => {
     }
   };
 
-  const changeNewsHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeProductHandler = (e: React.ChangeEvent<HTMLInputElement> ) => {
     const {name, value} = e.target;
-    setPost((prevState) => ({
+    setProduct((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const changeSelectHandler = (e: SelectChangeEvent ) => {
+    const {name, value} = e.target;
+    setProduct((prevState) => ({
       ...prevState,
       [name]: value
     }));
@@ -43,7 +61,7 @@ const AddForm = () => {
     const {name, files} = e.target;
 
     if (files) {
-      setPost(prevState => ({
+      setProduct(prevState => ({
         ...prevState,
         [name]: files[0]
       }));
@@ -57,22 +75,24 @@ const AddForm = () => {
 
   const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!post.image && post.description.trim() === '') {
-      alert('Image or description must be filled.');
-      return;
-    }
 
-    if (post.title[0] === ' ' || post.title === '') {
-      alert("You can't send post title started from whitespace or it can't be empty!");
+    if (fileName === '') {
+      alert("Please choose an image of product");
+    } else if (product.title[0] === ' ') {
+      alert('Product title can not begins from whitespace');
+    } else if (product.description[0] === ' ') {
+      alert('Product description can not begins from whitespace');
     } else {
       try {
-        await dispatch(newPost(post));
+        setDisabler(true);
+        await dispatch(newProduct(product));
+        setDisabler(false);
         navigate('/');
       } catch (e) {
         console.error(e);
       } finally {
         resetFileInput();
-        setPost(initialMessage);
+        setProduct(initialProduct);
         setFileName('');
       }
     }
@@ -87,8 +107,9 @@ const AddForm = () => {
             variant="outlined"
             label="Title"
             name="title"
-            value={post.title}
-            onChange={changeNewsHandler}
+            value={product.title}
+            onChange={changeProductHandler}
+            required
           />
         </Grid>
         <Grid item xs>
@@ -99,8 +120,9 @@ const AddForm = () => {
             variant="outlined"
             label="Description"
             name="description"
-            value={post.description}
-            onChange={changeNewsHandler}
+            value={product.description}
+            onChange={changeProductHandler}
+            required
           />
         </Grid>
         <Grid item xs>
@@ -114,32 +136,36 @@ const AddForm = () => {
         <Grid item xs>
           <TextField
             type={'number'}
+            InputProps={{ inputProps: { min: 1 }}}
             fullWidth
             variant="outlined"
             label="Price"
             name="price"
-            // value={post.description}
-            // onChange={changeNewsHandler}
+            value={product.price}
+            onChange={changeProductHandler}
+            required
           />
         </Grid>
         <Grid item xs>
           <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+            <InputLabel id="demo-simple-select-label">Category</InputLabel>
             <Select
               labelId="demo-simple-select-label"
-              // id="demo-simple-select"
-              value={'dfg'}
-              label="Age"
-              // onChange={handleChange}
+              id="demo-simple-select"
+              value={product.category}
+              name='category'
+              label="Category"
+              onChange={changeSelectHandler}
+              required
             >
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
+              {categories.map((category) => {
+                return <MenuItem key={category._id} value={category._id}>{category.title}</MenuItem>;
+              })}
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs>
-          <Button type="submit" variant="contained" endIcon={<SendIcon/>}>
+          <Button type="submit" variant="contained" endIcon={<SendIcon/>} disabled={disabler}>
             Send
           </Button>
         </Grid>
