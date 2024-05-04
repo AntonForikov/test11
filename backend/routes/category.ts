@@ -1,6 +1,8 @@
 import express from 'express';
 import Category from '../models/category';
 import mongoose from 'mongoose';
+import Product from '../models/product';
+import {ObjectId} from 'mongodb';
 
 const categoryRouter = express.Router();
 
@@ -27,6 +29,27 @@ categoryRouter.get('/',async (req, res,next) => {
     const categories = await Category.find();
 
     return res.send(categories);
+  } catch (e) {
+    next(e);
+  }
+});
+
+categoryRouter.get('/:id',async (req, res,next) => {
+  try {
+    const {id} = req.params;
+    let categoryId: ObjectId;
+
+    try {
+      categoryId = new ObjectId(id);
+    } catch (e) {
+      return res.status(400).send({error: 'Category is not an Object Id'})
+    }
+    const productsByCategory = await Product.find({category: categoryId})
+      .populate('category')
+      .select('title price image category');
+
+
+    return res.send(productsByCategory);
   } catch (e) {
     next(e);
   }
