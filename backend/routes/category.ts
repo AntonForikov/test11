@@ -1,8 +1,6 @@
 import express from 'express';
-import auth, {Auth} from '../middleware/auth';
 import Category from '../models/category';
 import mongoose from 'mongoose';
-import {ObjectId} from 'mongodb';
 
 const categoryRouter = express.Router();
 
