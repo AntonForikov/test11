@@ -39,14 +39,6 @@ const Register = () => {
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (user.displayName[0] === ' ' || user.displayName === '') {
-      alert('Display name can not be an empty string or berins from whitespace.');
-      return;
-    }
-    if (user.phoneNumber[0] === ' ' || user.phoneNumber === '') {
-      alert('Phone number can not be an empty string or berins from whitespace.');
-      return;
-    }
     await dispatch(register(user)).unwrap();
     navigate('/');
   };
@@ -108,8 +100,8 @@ const Register = () => {
                 name="displayName"
                 value={user.displayName}
                 onChange={changeEventHandler}
-                autoFocus
-                required
+                error={Boolean(getFieldError('displayName'))}
+                helperText={getFieldError('displayName')}
               />
               <TextField
                 margin="normal"
@@ -118,8 +110,8 @@ const Register = () => {
                 name="phoneNumber"
                 value={user.phoneNumber}
                 onChange={changeEventHandler}
-                autoFocus
-                required
+                error={Boolean(getFieldError('phoneNumber'))}
+                helperText={getFieldError('phoneNumber')}
               />
               <Grid container justifyContent="space-between" alignItems="center">
                 <FormControlLabel
