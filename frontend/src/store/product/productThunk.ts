@@ -35,7 +35,7 @@ export const newProduct = createAsyncThunk<void, Product, {state: RootState}>(
 
       keys.forEach(key => {
         const value = productData[key];
-        if (typeof (value) === 'string') formData.append(key, value);
+        if (value !== null) formData.append(key, value);
       });
       const {data} = await axiosApi.post(`/products`, formData, {headers: {Authorization: `Bearer ${token}`}});
       return data;
